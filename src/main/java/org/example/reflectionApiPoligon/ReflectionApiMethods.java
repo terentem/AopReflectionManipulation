@@ -1,6 +1,8 @@
 package org.example.reflectionApiPoligon;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 public class ReflectionApiMethods {
@@ -31,5 +33,12 @@ public class ReflectionApiMethods {
 
     public static Field getFieldObject(Class<?> clazz, String fieldName) throws NoSuchFieldException {
         return clazz.getDeclaredField(fieldName);
+    }
+
+    public static Object invokeMethod(Class<?> clazz, String methodName, Object newClass) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        Method method=clazz.getDeclaredMethod(methodName);
+        method.setAccessible(true);
+        Object result = method.invoke(newClass);
+        return result;
     }
 }

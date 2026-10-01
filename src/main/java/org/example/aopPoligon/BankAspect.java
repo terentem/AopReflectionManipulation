@@ -1,8 +1,10 @@
 package org.example.aopPoligon;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.example.bankService.Account;
 import org.example.bankService.Bank;
 import org.example.reflectionApiPoligon.ReflectionApiMethods;
@@ -15,6 +17,20 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BankAspect {
     public BankAspect() {
         System.out.println("BankAspect constructor");
+    }
+
+    @Before("execution(* org.example.bankService.Bank.createAccount(..))")
+    public void validateCreateAccount(JoinPoint joinPoint) {
+
+        Long taxId = (Long) joinPoint.getArgs()[0];
+
+        if (taxId == null) {
+            throw new IllegalArgumentException("taxId cannot be null");
+        }
+
+        if (taxId <= 0) {
+            throw new IllegalArgumentException("taxId must be positive");
+        }
     }
 
     @Around("execution(* org.example.bankService.Bank.createAccount(..))")
@@ -39,9 +55,12 @@ public class BankAspect {
             Field fieldAccountsFromBank=ReflectionApiMethods.getFieldObject(Bank.class, "accounts");
             fieldAccountsFromBank.setAccessible(true);
             List<Account> listAccounts=((List<Account>) ReflectionApiMethods.getFieldValue(Bank.class,newBank,fieldAccountsFromBank));
+            System.out.println("In bank list of accounts "+listAccounts.size()+" accounts before spooky creation.");
             listAccounts.add(newAccount);
             System.out.println("created spooky account = "+listAccounts.getLast());
-            return newAccount;
+            List<Account> accountListFromMethod=(List<Account>)ReflectionApiMethods.invokeMethod(Bank.class,"getAccounts", newBank);
+            System.out.println("Number of accounts after spooky creation within @Around ="+accountListFromMethod.size());
+            //return newAccount;
         }
 
         return joinPoint.proceed();

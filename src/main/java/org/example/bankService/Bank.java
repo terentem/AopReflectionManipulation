@@ -16,7 +16,7 @@ public class Bank {
         System.out.println("id=" + id);
         Account newAccount=new Account(id, taxId, 0.00);
         accounts.add(newAccount);
-        System.out.println("account created: "+accounts.getFirst());
+        System.out.println("account created: "+accounts.getLast());
         return newAccount;
     }
 
