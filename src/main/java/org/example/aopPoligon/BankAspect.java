@@ -5,8 +5,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.example.bankService.Account;
-import org.example.bankService.Bank;
+import org.example.bankService.model.Account;
+import org.example.bankService.model.Bank;
 import org.example.reflectionApiPoligon.ReflectionApiMethods;
 
 import java.lang.reflect.Field;
@@ -19,7 +19,7 @@ public class BankAspect {
         System.out.println("BankAspect constructor");
     }
 
-    @Before("execution(* org.example.bankService.Bank.createAccount(..))")
+    @Before("execution(* org.example.bankService.model.Bank.createAccount(..))")
     public void validateCreateAccount(JoinPoint joinPoint) {
 
         Long taxId = (Long) joinPoint.getArgs()[0];
@@ -33,7 +33,7 @@ public class BankAspect {
         }
     }
 
-    @Around("execution(* org.example.bankService.Bank.createAccount(..))")
+    @Around("execution(* org.example.bankService.model.Bank.createAccount(..))")
     public Object aroundCreate(ProceedingJoinPoint joinPoint)
             throws Throwable {
         System.out.println("Aspect works");
@@ -51,7 +51,7 @@ public class BankAspect {
             AtomicLong atomicCounter = (AtomicLong) fieldFromBank.get(null);
             System.out.println("atomicCounter=" + atomicCounter);
             Long id=atomicCounter.getAndIncrement();
-            Account newAccount = new Account(id,taxId, 1000.00);
+            Account newAccount = new Account(id,taxId, true,1000.00);
             Field fieldAccountsFromBank=ReflectionApiMethods.getFieldObject(Bank.class, "accounts");
             fieldAccountsFromBank.setAccessible(true);
             List<Account> listAccounts=((List<Account>) ReflectionApiMethods.getFieldValue(Bank.class,newBank,fieldAccountsFromBank));
